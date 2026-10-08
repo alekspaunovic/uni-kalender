@@ -1,0 +1,52 @@
+name: Feed aktualisieren
+
+# SPEC.md Abschnitt 10: alle sechs Stunden per Zeitplan plus manueller
+# Trigger. Liest den Abo-Link aus dem GitHub Secret UNI_ICS_URL, schreibt
+# docs/uni.ics und data/archive.json und committet beides zurück.
+#
+# Ist die Quelle nicht lesbar (Link abgelaufen, Hochschule nicht erreichbar),
+# endet der Lauf rot -- dann schickt GitHub eine Mail. Archiv und Feed
+# bleiben in dem Fall unverändert.
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  update-feed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Abhängigkeiten installieren
+        run: pip install -e .
+
+      - name: Feed erzeugen
+        env:
+          UNI_ICS_URL: ${{ secrets.UNI_ICS_URL }}
+        run: python -m uni_kalender.main
+
+      - name: docs/uni.ics und data/archive.json committen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/uni.ics data/archive.json
+          if git diff --cached --quiet; then
+            echo "Keine Änderungen am Feed."
+          else
+            git commit -m "Feed aktualisieren"
+            git push
+          fi
