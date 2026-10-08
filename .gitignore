@@ -1,0 +1,9 @@
+# Der Abo-Link der Hochschule steht nur hier und im GitHub Secret UNI_ICS_URL.
+.env
+
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+
+.DS_Store
