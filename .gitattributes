@@ -1,0 +1,4 @@
+# Die Fixture ist ein Originalexport der Hochschule, samt CRLF, einzelnem LF
+# und der kaputten "\n"-Zeile nach jeder DESCRIPTION. Git darf daran nichts
+# normalisieren, sonst testen die Tests nicht mehr die echte Quelle.
+fixtures/*.ics -text

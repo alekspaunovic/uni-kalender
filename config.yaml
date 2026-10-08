@@ -1,0 +1,44 @@
+# Konfiguration für den Uni-Kalender CBS. Siehe SPEC.md.
+
+timezone: Europe/Berlin
+feed_ttl: PT6H
+calname: Uni
+# UIDs im Feed: cbs-<Zahl aus der Quell-UID> (SPEC.md Abschnitt 9).
+uid_prefix: cbs
+
+output_path: docs/uni.ics
+archive_path: data/archive.json
+
+# Der Abo-Link kommt ausschließlich aus dieser Umgebungsvariablen (GitHub
+# Secret bzw. lokale .env), niemals aus dieser Datei.
+source_env: UNI_ICS_URL
+
+# Bekannte Veranstaltungstypen (SPEC.md Abschnitt 4). Erkannt wird der Typ am
+# Ende der SUMMARY, nicht über diese Liste -- ein neuer Typ wird übernommen
+# und nur im Log gemeldet.
+typen:
+  - LLO
+  - GSS
+  - LLC
+  - Prüfungstermin
+
+# Studiengangs-Codes (SPEC.md Abschnitt 5, Schritt 3). Nur Codes eintragen,
+# die wirklich in der Quelle vorkommen: ein Eintrag wie "BWL" würde auch ein
+# Modul "Einführung in die BWL" ohne Gruppe um sein letztes Wort kürzen.
+studiengaenge:
+  - GM
+  - WI
+  - WING
+
+# Modulnamen, bei denen die Regeln danebengreifen. Wird vor allen Regeln
+# geprüft. Schlüssel = Teilstring der Original-SUMMARY, Wert = Modulname.
+modul_overrides: {}
+#  "Teilstring aus der SUMMARY": "Gewünschter Modulname"
+
+# Schutz gegen fehlerhafte Abrufe (SPEC.md Abschnitt 9). Der Lauf bricht ab
+# und lässt das Archiv unverändert, wenn er auf einen Schlag mehr als diesen
+# Anteil der bekannten künftigen Termine streichen würde -- aber erst ab
+# schutz_mindestanzahl Streichungen, damit zum Semesterende die letzten ein,
+# zwei Termine nicht alles blockieren.
+schutz_anteil: 0.5
+schutz_mindestanzahl: 3
